@@ -1,1 +1,589 @@
+<!DOCTYPE html>
+<html lang="ml">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="FRIDGIT - The refrigerator that judges you. AI-powered virtual fridge with personality, sarcasm, and Malayalam roast messages.">
+<title>FRIDGIT — എന്താടാ വീണ്ടും വന്നത്?</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Malayalam:wght@300;400;600;700&family=Inter:wght@300;400;500;600;700;800;900&family=Orbitron:wght@400;600;700;900&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#08080f;--bg2:#0d0d1a;--surface:#12121f;--surface2:#1a1a2e;
+  --cyan:#00d4ff;--cyan-dim:rgba(0,212,255,0.12);
+  --pink:#ff3366;--green:#00ff88;--yellow:#ffd700;--orange:#ff8c00;--purple:#8b5cf6;
+  --text:#e8f4f8;--text-dim:#5a7a90;
+  --glow-cyan:0 0 20px rgba(0,212,255,0.5),0 0 60px rgba(0,212,255,0.2);
+  --glow-pink:0 0 20px rgba(255,51,102,0.5),0 0 60px rgba(255,51,102,0.2);
+  --font-main:'Inter','Noto Sans Malayalam',sans-serif;
+  --font-display:'Orbitron',sans-serif;
+  --font-ml:'Noto Sans Malayalam','Inter',sans-serif;
+  --r:16px;--r-lg:24px;--tr:0.3s cubic-bezier(0.4,0,0.2,1)
+}
+html{scroll-behavior:smooth}
+body{font-family:var(--font-main);background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 80% 50% at 50% -10%,rgba(0,212,255,0.07) 0%,transparent 70%),radial-gradient(ellipse 60% 40% at 80% 100%,rgba(139,92,246,0.05) 0%,transparent 60%);pointer-events:none;z-index:0}
+body::after{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,212,255,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(0,212,255,0.025) 1px,transparent 1px);background-size:50px 50px;pointer-events:none;z-index:0}
 
+/* ── LAYOUT ── */
+.page{display:none;position:relative;z-index:1;min-height:100vh;padding:20px;padding-top:80px}
+.page.active{display:flex;flex-direction:column;align-items:center}
+
+/* ── NAV ── */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:10px 20px;display:flex;align-items:center;justify-content:space-between;background:rgba(8,8,15,0.85);backdrop-filter:blur(20px);border-bottom:1px solid rgba(0,212,255,0.1)}
+.nav-logo{font-family:var(--font-display);font-size:1.3rem;font-weight:900;color:var(--cyan);text-shadow:var(--glow-cyan);cursor:pointer;letter-spacing:2px;flex-shrink:0}
+.nav-links{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
+.nav-btn{background:transparent;border:1px solid rgba(0,212,255,0.18);color:var(--text-dim);padding:5px 12px;border-radius:50px;font-size:0.72rem;cursor:pointer;transition:var(--tr);font-family:var(--font-main)}
+.nav-btn:hover,.nav-btn.active{border-color:var(--cyan);color:var(--cyan);background:var(--cyan-dim)}
+.sound-btn{background:transparent;border:1px solid rgba(255,255,255,0.15);color:var(--text-dim);width:34px;height:34px;border-radius:50%;cursor:pointer;font-size:1rem;transition:var(--tr);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sound-btn:hover{border-color:var(--cyan);color:var(--cyan)}
+
+/* ── TYPOGRAPHY ── */
+.disp{font-family:var(--font-display);font-size:clamp(2.8rem,7vw,5.5rem);font-weight:900;color:var(--cyan);text-shadow:var(--glow-cyan);letter-spacing:4px;line-height:1;text-align:center}
+.ml-h{font-family:var(--font-ml);font-size:clamp(1.1rem,2.5vw,1.6rem);font-weight:700;color:var(--text);text-align:center;line-height:1.5}
+.ml-sub{font-family:var(--font-ml);font-size:clamp(0.85rem,1.8vw,1rem);color:var(--text-dim);text-align:center;line-height:1.6}
+.tagline{font-family:var(--font-ml);font-size:clamp(0.8rem,1.6vw,0.95rem);color:var(--yellow);text-align:center;font-style:italic}
+.sec-title{font-family:var(--font-display);font-size:1rem;font-weight:700;color:var(--text-dim);text-transform:uppercase;letter-spacing:3px;text-align:center}
+.sec-title span{color:var(--cyan)}
+
+/* ── VOICE / SPEAKING WAVE ── */
+.speaking-wave{display:none;align-items:center;gap:3px;height:16px;margin-left:8px;vertical-align:middle}
+.speaking .speaking-wave{display:inline-flex}
+.speaking-wave span{display:block;width:3px;background:var(--cyan);border-radius:2px;animation:waveAnim .5s ease-in-out infinite alternate}
+.speaking-wave span:nth-child(1){height:6px;animation-delay:0s}
+.speaking-wave span:nth-child(2){height:14px;animation-delay:.12s}
+.speaking-wave span:nth-child(3){height:18px;animation-delay:.24s}
+.speaking-wave span:nth-child(4){height:8px;animation-delay:.36s}
+@keyframes waveAnim{0%{transform:scaleY(0.3);background:var(--cyan)}100%{transform:scaleY(1.3);background:var(--yellow)}}
+.speak-btn{background:rgba(0,212,255,0.08);border:1px solid rgba(0,212,255,0.3);color:var(--cyan);padding:4px 10px;border-radius:50px;cursor:pointer;font-size:0.75rem;font-family:var(--font-main);display:inline-flex;align-items:center;gap:4px;transition:var(--tr);margin-left:8px}
+.speak-btn:hover{background:rgba(0,212,255,0.2);transform:scale(1.05)}
+.voice-active-indicator{color:var(--green);font-size:0.7rem;font-weight:700}
+
+/* ── BUTTONS ── */
+.btn{display:inline-flex;align-items:center;gap:8px;padding:12px 24px;border-radius:50px;font-size:0.95rem;font-weight:600;cursor:pointer;border:none;transition:all .3s ease;font-family:var(--font-main)}
+.btn-primary{background:linear-gradient(135deg,var(--cyan),#0099cc);color:#000;box-shadow:var(--glow-cyan)}
+.btn-primary:hover{transform:translateY(-2px) scale(1.02);box-shadow:0 0 40px rgba(0,212,255,0.9)}
+.btn-secondary{background:transparent;color:var(--cyan);border:2px solid var(--cyan)}
+.btn-secondary:hover{background:var(--cyan-dim);transform:translateY(-2px)}
+.btn-ghost{background:rgba(255,255,255,0.05);color:var(--text);border:1px solid rgba(255,255,255,0.1)}
+.btn-ghost:hover{background:rgba(255,255,255,0.1);transform:translateY(-2px)}
+.btn-yes{background:linear-gradient(135deg,#00ff88,#00cc66);color:#000;font-weight:700;padding:10px 20px}
+.btn-no{background:linear-gradient(135deg,var(--pink),#cc0033);color:#fff;font-weight:700;padding:10px 20px}
+.btn-think{background:linear-gradient(135deg,var(--yellow),var(--orange));color:#000;font-weight:700;padding:10px 20px}
+.btn:disabled{opacity:.4;cursor:not-allowed;transform:none!important}
+
+/* ── CARD ── */
+.card{background:rgba(18,18,31,0.85);border:1px solid rgba(0,212,255,0.15);border-radius:var(--r-lg);padding:24px;backdrop-filter:blur(20px)}
+
+/* ── ANIMATIONS ── */
+@keyframes fadeIn{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+@keyframes slideIn{from{opacity:0;transform:translateX(-30px)}to{opacity:1;transform:translateX(0)}}
+@keyframes shake{0%,100%{transform:translateX(0)}15%,45%,75%{transform:translateX(-7px) rotate(-.8deg)}30%,60%,90%{transform:translateX(7px) rotate(.8deg)}}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+@keyframes glowPulse{0%,100%{box-shadow:var(--glow-cyan)}50%{box-shadow:0 0 40px rgba(0,212,255,.9),0 0 100px rgba(0,212,255,.4)}}
+@keyframes bounce{0%,20%,50%,80%,100%{transform:translateY(0)}40%{transform:translateY(-14px)}60%{transform:translateY(-6px)}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+@keyframes glitch{0%{transform:translate(0)}25%{transform:translate(-2px,2px)}50%{transform:translate(2px,-2px)}75%{transform:translate(-2px,-2px)}100%{transform:translate(0)}}
+@keyframes angerBg{0%,100%{background:var(--bg)}50%{background:#120008}}
+@keyframes milestoneAnim{0%{opacity:0;transform:translate(-50%,-50%) scale(.5)}20%{opacity:1;transform:translate(-50%,-50%) scale(1.1)}70%{opacity:1;transform:translate(-50%,-50%) scale(1)}100%{opacity:0;transform:translate(-50%,-50%) scale(.9) translateY(-30px)}}
+@keyframes floatParticle{0%{transform:translateY(100vh) translateX(0);opacity:0}10%{opacity:.4}90%{opacity:.4}100%{transform:translateY(-20px) translateX(var(--drift,50px));opacity:0}}
+@keyframes doorOpen{from{transform:perspective(1200px) rotateY(0deg)}to{transform:perspective(1200px) rotateY(-82deg)}}
+@keyframes countUp{from{transform:translateY(12px);opacity:0}to{transform:translateY(0);opacity:1}}
+
+/* ── HOME PAGE ── */
+#page-home{justify-content:center;text-align:center;gap:0}
+.home-hero{animation:fadeIn .8s ease;display:flex;flex-direction:column;align-items:center;gap:8px}
+.home-badge{display:inline-block;background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.3);color:var(--cyan);padding:5px 14px;border-radius:50px;font-size:.75rem;font-weight:600;letter-spacing:2px;text-transform:uppercase;margin-bottom:4px}
+.fridge-icon-home{font-size:4.5rem;animation:float 3s ease-in-out infinite;display:block}
+.home-btns{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-top:32px;width:100%;max-width:560px}
+.home-btn{display:flex;flex-direction:column;align-items:center;gap:8px;padding:22px 16px;background:rgba(18,18,31,.85);border:1px solid rgba(0,212,255,.18);border-radius:var(--r-lg);cursor:pointer;transition:all .3s ease;font-family:var(--font-main);color:var(--text);font-size:.85rem;font-weight:600;text-transform:uppercase;letter-spacing:1px}
+.home-btn:hover{border-color:var(--cyan);background:rgba(0,212,255,.08);transform:translateY(-4px);box-shadow:0 12px 40px rgba(0,212,255,.18)}
+.home-btn .bi{font-size:1.9rem}
+.home-btn:nth-child(1){animation:fadeIn .8s .1s both}
+.home-btn:nth-child(2){animation:fadeIn .8s .2s both}
+.home-btn:nth-child(3){animation:fadeIn .8s .3s both}
+.home-btn:nth-child(4){animation:fadeIn .8s .4s both}
+.visit-pill{display:flex;align-items:center;gap:10px;margin:20px auto 0;background:rgba(0,212,255,.05);border:1px solid rgba(0,212,255,.15);border-radius:50px;padding:8px 18px;width:fit-content}
+.visit-pill .vnum{color:var(--cyan);font-weight:800;font-family:var(--font-display);font-size:1.05rem}
+
+/* ── FRIDGE PAGE ── */
+#page-fridge{gap:16px;justify-content:flex-start}
+.stats-bar{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+.stat-pill{background:rgba(18,18,31,.9);border:1px solid rgba(0,212,255,.14);border-radius:50px;padding:7px 14px;font-size:.82rem;display:flex;align-items:center;gap:5px}
+.stat-pill .sv{color:var(--cyan);font-weight:700}
+.fridge-msg-box{background:rgba(18,18,31,.92);border:1px solid rgba(0,212,255,.22);border-radius:var(--r-lg);padding:16px 22px;text-align:center;min-height:72px;display:flex;align-items:center;justify-content:center;width:100%;max-width:560px;position:relative}
+.fridge-msg-box::before{content:'🤖';position:absolute;top:8px;left:12px;font-size:.85rem;opacity:.45}
+.fridge-msg-text{font-family:var(--font-ml);font-size:1rem;line-height:1.65;color:var(--text);animation:fadeIn .4s ease}
+
+/* ── FRIDGE VISUAL ── */
+.fridge-wrap{width:100%;max-width:320px;position:relative;perspective:1200px}
+.fridge-body{width:100%;background:linear-gradient(170deg,#ddeef5 0%,#c0d8e8 40%,#aac8dc 100%);border-radius:22px 22px 18px 18px;box-shadow:0 0 0 3px rgba(255,255,255,.25),0 24px 60px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.7);overflow:hidden;position:relative}
+
+/* Freezer */
+.fridge-freezer{height:130px;background:linear-gradient(170deg,#c8dce8 0%,#b0ccd8 100%);border-bottom:3px solid rgba(0,0,0,.15);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:filter .2s}
+.fridge-freezer:hover{filter:brightness(1.05)}
+.freezer-inner{display:flex;flex-direction:column;align-items:center;gap:4px}
+.freezer-lbl{font-size:.6rem;color:rgba(0,50,80,.65);letter-spacing:2px;text-transform:uppercase}
+.freezer-items{font-size:1.3rem}
+.freezer-hint{font-size:.55rem;color:rgba(0,80,120,.55);margin-top:2px}
+
+/* Main compartment */
+.fridge-main{height:360px;position:relative;overflow:hidden}
+.fridge-interior{position:absolute;inset:0;background:linear-gradient(170deg,#0c1828 0%,#091420 100%);padding:10px 6px;overflow-y:auto}
+.fridge-interior::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:100px;height:18px;background:rgba(255,255,220,.25);border-radius:0 0 50% 50%;filter:blur(8px)}
+.shelf{border-bottom:2px solid rgba(255,255,255,.12);padding:6px 4px 12px;margin-bottom:2px}
+.shelf:last-child{border-bottom:none}
+.shelf-lbl{font-size:.6rem;color:rgba(255,255,255,.28);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px}
+.food-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:5px}
+.food-item{display:flex;flex-direction:column;align-items:center;gap:2px;padding:7px 3px;border-radius:9px;cursor:pointer;transition:all .2s ease;background:rgba(255,255,255,.05);border:1px solid transparent;position:relative}
+.food-item:hover{background:rgba(0,212,255,.14);border-color:rgba(0,212,255,.4);transform:scale(1.06)}
+.food-item:active{transform:scale(.95)}
+.food-emoji{font-size:1.55rem;line-height:1}
+.food-name{font-size:.55rem;color:rgba(255,255,255,.68);text-align:center;font-weight:500}
+.age-badge{position:absolute;top:-4px;right:-4px;width:15px;height:15px;border-radius:50%;font-size:.5rem;display:flex;align-items:center;justify-content:center;font-weight:700;border:1px solid rgba(0,0,0,.3)}
+
+/* Stare timer overlay */
+.stare-overlay{display:none;position:absolute;inset:0;background:rgba(0,0,0,.75);z-index:20;align-items:center;justify-content:center;flex-direction:column;gap:10px;border-radius:0 0 18px 18px}
+.stare-overlay.vis{display:flex}
+.stare-num{font-size:2.8rem;font-weight:900;color:var(--pink);font-family:var(--font-display)}
+.stare-msg{font-family:var(--font-ml);font-size:.95rem;color:var(--text);text-align:center;padding:0 16px}
+
+/* Door */
+.fridge-door{position:absolute;inset:0;background:linear-gradient(170deg,#ddeef5 0%,#c8dce8 50%,#b8d0e0 100%);transform-origin:left center;transform-style:preserve-3d;transition:transform .8s cubic-bezier(.4,0,.2,1);z-index:10;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px}
+.fridge-door.open{transform:perspective(1200px) rotateY(-82deg)}
+.door-handle{position:absolute;right:18px;top:50%;transform:translateY(-50%);width:9px;height:72px;background:linear-gradient(90deg,#888,#ccc,#888);border-radius:5px;box-shadow:2px 2px 8px rgba(0,0,0,.3)}
+.door-face{font-size:2.8rem;transition:all .5s ease}
+.door-brand{font-family:var(--font-display);font-size:1.1rem;font-weight:900;color:rgba(0,212,255,.8);letter-spacing:3px;text-shadow:0 0 10px rgba(0,212,255,.5)}
+.door-sub{font-family:var(--font-ml);font-size:.6rem;color:rgba(0,100,150,.75)}
+
+/* Fridge control button */
+.fridge-ctrl{width:100%;max-width:320px;padding:15px;font-size:1rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;border:none;border-radius:var(--r);cursor:pointer;transition:all .3s ease;font-family:var(--font-display);background:linear-gradient(135deg,var(--cyan),#0099cc);color:#000;box-shadow:var(--glow-cyan);position:relative;overflow:hidden}
+.fridge-ctrl:hover:not(:disabled){transform:translateY(-3px);box-shadow:0 0 40px rgba(0,212,255,.9)}
+.fridge-ctrl.open-st{background:linear-gradient(135deg,var(--pink),#cc0033);box-shadow:var(--glow-pink);color:#fff}
+.fridge-ctrl:disabled{background:rgba(80,80,110,.5);box-shadow:none;cursor:not-allowed;color:rgba(255,255,255,.4)}
+.lockout-msg{display:none;text-align:center;color:var(--pink);font-family:var(--font-ml);font-size:.88rem;padding:8px 16px;border:1px solid rgba(255,51,102,.3);border-radius:var(--r);background:rgba(255,51,102,.07);animation:fadeIn .3s ease}
+
+/* ── ANGER MODE ── */
+body.anger-mode{animation:angerBg .5s ease infinite}
+body.anger-mode .fridge-body{animation:shake .25s ease infinite}
+.anger-overlay{display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.92);align-items:center;justify-content:center;flex-direction:column;gap:18px;text-align:center;padding:20px;animation:fadeIn .3s ease}
+.anger-overlay.vis{display:flex}
+.anger-title{font-family:var(--font-ml);font-size:clamp(1.3rem,3.5vw,2.2rem);color:var(--pink);text-shadow:var(--glow-pink);animation:pulse .5s infinite}
+.anger-timer{font-family:var(--font-display);font-size:4.5rem;font-weight:900;color:var(--pink);animation:pulse 1s infinite}
+
+/* ── FINAL BOSS ── */
+.boss-overlay{display:none;position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.96);align-items:center;justify-content:center;flex-direction:column;gap:22px;text-align:center;padding:20px;animation:fadeIn .5s ease}
+.boss-overlay.vis{display:flex}
+.boss-q{font-family:var(--font-ml);font-size:clamp(1.1rem,2.5vw,1.6rem);color:var(--yellow);text-shadow:0 0 20px rgba(255,215,0,.5);max-width:560px}
+.boss-opts{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;max-width:380px}
+.boss-opt{padding:12px 18px;background:rgba(255,215,0,.07);border:1px solid rgba(255,215,0,.3);border-radius:var(--r);color:var(--text);font-family:var(--font-ml);font-size:.92rem;cursor:pointer;transition:all .2s ease}
+.boss-opt:hover{background:rgba(255,215,0,.18);border-color:var(--yellow);transform:translateY(-2px)}
+.boss-ans{font-family:var(--font-ml);font-size:2.2rem;color:var(--cyan);display:none}
+
+/* ── FOOD MODAL ── */
+.food-modal{display:none;position:fixed;inset:0;z-index:250;background:rgba(0,0,0,.8);align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(10px)}
+.food-modal.vis{display:flex}
+.modal-card{background:var(--surface);border:1px solid rgba(0,212,255,.25);border-radius:var(--r-lg);padding:28px 24px;max-width:400px;width:100%;text-align:center;animation:fadeIn .3s ease,bounce .5s ease}
+.modal-emoji{font-size:3.5rem;display:block;margin-bottom:10px;animation:bounce .6s ease}
+.modal-reaction{font-family:var(--font-ml);font-size:.95rem;color:var(--text);margin-bottom:6px;line-height:1.65;white-space:pre-line}
+.modal-question{font-family:var(--font-ml);font-size:1.15rem;font-weight:700;color:var(--cyan);margin:14px 0 6px}
+.modal-response{display:none;font-family:var(--font-ml);font-size:.98rem;color:var(--green);margin-top:10px;animation:fadeIn .3s ease;padding:10px 16px;background:rgba(0,255,136,.06);border-radius:var(--r);border:1px solid rgba(0,255,136,.2)}
+.modal-dec-btns{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:6px}
+
+/* ── STATS PAGE ── */
+#page-stats{gap:20px}
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:14px;width:100%;max-width:760px}
+.stat-card{background:rgba(18,18,31,.9);border:1px solid rgba(0,212,255,.14);border-radius:var(--r-lg);padding:18px;text-align:center;transition:all .3s ease}
+.stat-card:hover{border-color:var(--cyan);transform:translateY(-4px);box-shadow:0 12px 40px rgba(0,212,255,.14)}
+.sc-icon{font-size:1.9rem;margin-bottom:6px}
+.sc-val{font-family:var(--font-display);font-size:2rem;font-weight:900;color:var(--cyan);margin-bottom:3px;animation:countUp .4s ease}
+.sc-lbl{font-size:.75rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px}
+.prog-card{background:rgba(18,18,31,.9);border:1px solid rgba(0,212,255,.14);border-radius:var(--r-lg);padding:20px 22px;width:100%;max-width:760px}
+.prog-row{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.prog-row:last-child{margin-bottom:0}
+.prog-lbl{font-size:.8rem;color:var(--text-dim);min-width:170px;font-family:var(--font-ml)}
+.prog-track{flex:1;height:8px;background:rgba(255,255,255,.07);border-radius:4px;overflow:hidden}
+.prog-fill{height:100%;border-radius:4px;transition:width 1s ease}
+.prog-val{font-size:.82rem;font-weight:700;min-width:44px;text-align:right}
+.food-stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(88px,1fr));gap:8px;width:100%;max-width:760px}
+.fsi{background:rgba(18,18,31,.9);border:1px solid rgba(255,255,255,.07);border-radius:var(--r);padding:12px 8px;text-align:center}
+.fsi-em{font-size:1.7rem}
+.fsi-nm{font-size:.65rem;color:var(--text-dim);margin:3px 0}
+.fsi-ct{font-size:.8rem;color:var(--cyan);font-weight:700}
+.best-worst{display:flex;gap:14px;align-items:center;flex-wrap:wrap;justify-content:center}
+.bw-item{text-align:center}
+.bw-lbl{font-size:.7rem;color:var(--text-dim);margin-bottom:3px}
+.bw-val{font-size:1.1rem;color:var(--cyan)}
+.reset-btn{background:transparent;border:1px solid rgba(255,51,102,.3);color:var(--pink);padding:7px 18px;border-radius:50px;font-size:.78rem;cursor:pointer;transition:all .2s;font-family:var(--font-main)}
+.reset-btn:hover{background:rgba(255,51,102,.1);border-color:var(--pink)}
+
+/* ── PERSONALITY PAGE ── */
+#page-personality{gap:22px}
+.pers-card{background:rgba(18,18,31,.9);border:2px solid rgba(0,212,255,.22);border-radius:var(--r-lg);padding:32px 28px;text-align:center;max-width:480px;width:100%;animation:glowPulse 3s ease infinite}
+.pers-face{font-size:4.5rem;display:block;margin-bottom:14px;animation:bounce 2s ease infinite}
+.pers-name{font-family:var(--font-display);font-size:1.3rem;font-weight:700;color:var(--cyan);letter-spacing:2px;margin-bottom:10px}
+.pers-quote{font-family:var(--font-ml);font-size:1rem;color:var(--text);line-height:1.75;border-left:3px solid var(--cyan);padding-left:14px;text-align:left;margin:10px 0}
+.pers-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;width:100%;max-width:660px}
+.pers-mini{background:rgba(18,18,31,.85);border:1px solid rgba(255,255,255,.08);border-radius:var(--r);padding:14px 10px;text-align:center;cursor:pointer;transition:all .2s}
+.pers-mini:hover{border-color:var(--cyan);transform:translateY(-3px)}
+.pers-mini.active{border-color:var(--cyan);background:var(--cyan-dim)}
+.iq-card{background:rgba(18,18,31,.9);border:1px solid rgba(255,215,0,.2);border-radius:var(--r-lg);padding:26px;text-align:center;max-width:480px;width:100%}
+.iq-lbl{font-size:.75rem;color:var(--text-dim);letter-spacing:3px;text-transform:uppercase;margin-bottom:4px}
+.iq-num{font-family:var(--font-display);font-size:5rem;font-weight:900;color:var(--yellow);text-shadow:0 0 30px rgba(255,215,0,.5);line-height:1}
+.iq-exp{font-family:var(--font-ml);font-size:.88rem;color:var(--text-dim);margin-top:14px;line-height:1.65}
+
+/* ── USELESS PAGE ── */
+#page-useless{gap:22px}
+.score-circle-wrap{position:relative;width:190px;height:190px;margin:0 auto}
+.score-ring{width:190px;height:190px;border-radius:50%;background:conic-gradient(var(--cyan) 0%,rgba(255,255,255,.05) 0%);display:flex;align-items:center;justify-content:center;box-shadow:0 0 40px rgba(0,212,255,.28);transition:background 1.2s ease}
+.score-inner{width:145px;height:145px;border-radius:50%;background:var(--surface);display:flex;flex-direction:column;align-items:center;justify-content:center}
+.score-num{font-family:var(--font-display);font-size:2.4rem;font-weight:900;color:var(--cyan)}
+.score-pct{font-size:.7rem;color:var(--text-dim)}
+.useless-rank-title{font-family:var(--font-display);font-size:1.7rem;font-weight:900;color:var(--yellow);text-shadow:0 0 20px rgba(255,215,0,.5);letter-spacing:2px;text-align:center}
+.useless-congrats{font-family:var(--font-ml);font-size:.95rem;color:var(--text-dim);margin-top:6px;text-align:center}
+.rank-tiers{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;width:100%;max-width:660px}
+.rank-tier{background:rgba(18,18,31,.85);border:1px solid rgba(255,255,255,.07);border-radius:var(--r);padding:12px;text-align:center;transition:all .2s}
+.rank-tier.cur{border-color:var(--yellow);background:rgba(255,215,0,.07);box-shadow:0 0 18px rgba(255,215,0,.18)}
+.rt-range{font-size:.7rem;color:var(--text-dim)}
+.rt-name{font-size:.88rem;font-weight:700;color:var(--text);margin-top:3px}
+
+/* ── ABOUT PAGE ── */
+#page-about{gap:22px}
+.about-card{background:rgba(18,18,31,.9);border:1px solid rgba(0,212,255,.14);border-radius:var(--r-lg);padding:26px 28px;max-width:580px;width:100%}
+.ab-sec{margin-bottom:20px;padding-bottom:20px;border-bottom:1px solid rgba(255,255,255,.07)}
+.ab-sec:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
+.ab-lbl{font-size:.72rem;color:var(--cyan);text-transform:uppercase;letter-spacing:2px;font-weight:700;margin-bottom:6px}
+.ab-val{font-family:var(--font-ml);font-size:1rem;color:var(--text);line-height:1.7}
+.tech-pills{display:flex;flex-wrap:wrap;gap:7px;margin-top:7px}
+.tech-pill{background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.3);color:var(--cyan);padding:3px 11px;border-radius:50px;font-size:.75rem;font-weight:600}
+
+/* ── TOASTS ── */
+.toast-wrap{position:fixed;top:72px;right:18px;z-index:500;display:flex;flex-direction:column;gap:7px;pointer-events:none}
+.toast{background:rgba(18,18,31,.96);border:1px solid rgba(0,212,255,.3);border-radius:var(--r);padding:10px 14px;font-family:var(--font-ml);font-size:.87rem;color:var(--text);max-width:270px;animation:slideIn .3s ease;backdrop-filter:blur(10px);pointer-events:all;transition:all .3s ease}
+.toast.warn{border-color:rgba(255,215,0,.5);background:rgba(28,24,0,.96)}
+.toast.danger{border-color:rgba(255,51,102,.5);background:rgba(28,0,8,.96)}
+
+/* ── PARTICLES ── */
+.particles{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.particle{position:absolute;width:2px;height:2px;border-radius:50%;opacity:0;animation:floatParticle var(--dur,8s) var(--del,0s) ease-in-out infinite}
+
+/* ── MILESTONE FLASH ── */
+.milestone-flash{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:400;font-family:var(--font-ml);font-size:clamp(1.4rem,4vw,2.8rem);font-weight:900;color:var(--cyan);text-align:center;pointer-events:none;animation:milestoneAnim 2.2s ease forwards;text-shadow:var(--glow-cyan)}
+
+/* ── MISC ── */
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:rgba(0,212,255,.3);border-radius:3px}
+.divider{width:100%;height:1px;background:linear-gradient(90deg,transparent,rgba(0,212,255,.3),transparent);margin:4px 0}
+body.anger-mode .disp{color:var(--pink);text-shadow:var(--glow-pink)}
+.glitch{animation:glitch .2s ease infinite}
+
+@media(max-width:480px){
+  nav{padding:8px 10px}
+  .nav-links{gap:3px}
+  .nav-btn{padding:4px 9px;font-size:.68rem}
+  .home-btns{grid-template-columns:1fr 1fr}
+  .fridge-wrap{max-width:270px}
+  .fridge-main{height:320px}
+}
+</style>
+</head>
+<body>
+
+<!-- Particles -->
+<div class="particles" id="particles"></div>
+
+<!-- Toasts -->
+<div class="toast-wrap" id="toast-wrap"></div>
+
+<!-- ═══ NAV ═══ -->
+<nav>
+  <div class="nav-logo" onclick="nav('home')">🧊 FRIDGIT</div>
+  <div class="nav-links">
+    <button class="nav-btn" id="nb-home"        onclick="nav('home')">Home</button>
+    <button class="nav-btn" id="nb-fridge"      onclick="nav('fridge')">Fridge</button>
+    <button class="nav-btn" id="nb-stats"       onclick="nav('stats')">Stats</button>
+    <button class="nav-btn" id="nb-personality" onclick="nav('personality')">Personality</button>
+    <button class="nav-btn" id="nb-useless"     onclick="nav('useless')">Score</button>
+    <button class="nav-btn" id="nb-about"       onclick="nav('about')">About</button>
+  </div>
+  <div style="display:flex;align-items:center;gap:6px">
+    <button class="sound-btn" id="voice-btn" onclick="toggleVoice()" title="Voice Pronunciation (Speech TTS)">🗣️</button>
+    <button class="sound-btn" id="snd-btn" onclick="toggleSound()" title="Sound Effects">🔊</button>
+  </div>
+</nav>
+
+<!-- ═══════════════════════════════════════════════════════════
+     HOME PAGE
+═══════════════════════════════════════════════════════════ -->
+<section id="page-home" class="page active">
+  <div class="home-hero">
+    <div class="home-badge">🧊 AI-Powered &middot; College Edition</div>
+    <span class="fridge-icon-home">🧊</span>
+    <h1 class="disp">FRIDGIT</h1>
+    <p style="font-size:1rem;color:var(--text-dim);margin:4px 0;font-family:var(--font-ml)">The Fridge That Judges You</p>
+    <h2 class="ml-h" style="margin:6px 0">"എന്താടാ വീണ്ടും വന്നത്?"</h2>
+    <p class="ml-sub">"നീ വീണ്ടും? ഭക്ഷണം മാറിയിട്ടില്ല!"</p>
+    <p class="tagline">"ഭക്ഷണം അല്ല, വിമർശനമാണ് ഇവിടെ ഫ്രീ!"</p>
+    <div style="margin-top:10px">
+      <button class="speak-btn" onclick="speakHomeTagline()">🗣️ Pronounce Roast</button>
+    </div>
+    <div class="visit-pill">
+      <span>🚪</span>
+      <span style="font-size:.82rem;color:var(--text-dim)">Today's Visits:</span>
+      <span class="vnum" id="home-visits">0</span>
+    </div>
+  </div>
+  <div class="home-btns">
+    <button class="home-btn" onclick="nav('fridge')"><span class="bi">🧊</span>OPEN THE FRIDGE</button>
+    <button class="home-btn" onclick="nav('stats')"><span class="bi">📊</span>MY FRIDGE HISTORY</button>
+    <button class="home-btn" onclick="nav('personality')"><span class="bi">🤖</span>FRIDGE PERSONALITY</button>
+    <button class="home-btn" onclick="nav('useless')"><span class="bi">🏆</span>USELESSNESS SCORE</button>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     FRIDGE PAGE
+═══════════════════════════════════════════════════════════ -->
+<section id="page-fridge" class="page">
+  <!-- Stats bar -->
+  <div class="stats-bar">
+    <div class="stat-pill">🚪 Visits: <span class="sv" id="fp-visits">0</span></div>
+    <div class="stat-pill">🍽️ Taken: <span class="sv" id="fp-taken">0</span></div>
+    <div class="stat-pill">👀 Stares: <span class="sv" id="fp-stares">0</span></div>
+    <div class="stat-pill">😒 Mood: <span class="sv" id="fp-mood">😒</span></div>
+    <div class="stat-pill">🗣️ Voice: <span class="sv voice-active-indicator" id="fp-voice">ACTIVE</span></div>
+  </div>
+
+  <!-- Message box with voice indicator -->
+  <div class="fridge-msg-box" id="msg-box">
+    <div style="display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;width:100%">
+      <p class="fridge-msg-text" id="msg-text">ഫ്രിഡ്ജ് തുറക്കാൻ തയ്യാറാണ്. നീ?</p>
+      <div class="speaking-wave"><span></span><span></span><span></span><span></span></div>
+      <button class="speak-btn" id="repeat-btn" onclick="repeatCurrentMsg()" title="Pronounce again">🗣️ Speak</button>
+    </div>
+  </div>
+
+  <!-- Fridge visual -->
+  <div class="fridge-wrap" id="fridge-wrap">
+    <div class="fridge-body" id="fridge-body">
+
+      <!-- Freezer -->
+      <div class="fridge-freezer" onclick="freezerClick()">
+        <div class="freezer-inner">
+          <div class="freezer-lbl">❄️ FREEZER</div>
+          <div class="freezer-items" id="fz-items">🍦 🧊 🥶</div>
+          <div class="freezer-hint">Click me... I dare you</div>
+        </div>
+      </div>
+
+      <!-- Main compartment -->
+      <div class="fridge-main" id="fridge-main">
+        <div class="fridge-interior" id="fridge-interior">
+          <div class="shelf"><div class="shelf-lbl">Top Shelf</div><div class="food-grid" id="fg1"></div></div>
+          <div class="shelf"><div class="shelf-lbl">Middle Shelf</div><div class="food-grid" id="fg2"></div></div>
+          <div class="shelf"><div class="shelf-lbl">Crisper</div><div class="food-grid" id="fg3"></div></div>
+          <!-- Stare overlay -->
+          <div class="stare-overlay" id="stare-overlay">
+            <div style="font-size:2rem" id="stare-face">😐</div>
+            <div class="stare-num" id="stare-num">5</div>
+            <div class="stare-msg" id="stare-msg">എന്താ നോക്കുന്നത്?</div>
+          </div>
+        </div>
+        <!-- Door overlay -->
+        <div class="fridge-door" id="fridge-door">
+          <div class="door-face" id="door-face">😐</div>
+          <div class="door-brand">FRIDGIT</div>
+          <div class="door-sub">The Fridge That Judges You</div>
+          <div class="door-handle"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <button class="fridge-ctrl" id="fridge-ctrl" onclick="toggleFridge()">🧊 OPEN FRIDGE</button>
+  <div class="lockout-msg" id="lockout-msg">⏳ ഇനി ഒന്ന് ആലോചിക്ക്... <span id="lockout-cd">10</span>s</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     STATS PAGE
+═══════════════════════════════════════════════════════════ -->
+<section id="page-stats" class="page">
+  <h1 class="disp" style="font-size:2.2rem;margin-top:10px">FRIDGE STATS</h1>
+  <p class="ml-sub">"Completely unnecessary data about your completely unnecessary habits."</p>
+  <div class="stats-grid">
+    <div class="stat-card"><div class="sc-icon">🚪</div><div class="sc-val" id="ss-v">0</div><div class="sc-lbl">Fridge Visits</div></div>
+    <div class="stat-card"><div class="sc-icon">🍽️</div><div class="sc-val" id="ss-t">0</div><div class="sc-lbl">Food Taken</div></div>
+    <div class="stat-card"><div class="sc-icon">👀</div><div class="sc-val" id="ss-s">0</div><div class="sc-lbl">Times You Stared</div></div>
+    <div class="stat-card"><div class="sc-icon">⚡</div><div class="sc-val" id="ss-r">0</div><div class="sc-lbl">Rapid Reopens</div></div>
+    <div class="stat-card"><div class="sc-icon">😤</div><div class="sc-val" id="ss-rej">0</div><div class="sc-lbl">Food Rejected</div></div>
+    <div class="stat-card"><div class="sc-icon">⏱️</div><div class="sc-val" id="ss-st">0s</div><div class="sc-lbl">Total Stare Time</div></div>
+  </div>
+  <div class="prog-card">
+    <div class="prog-row">
+      <span class="prog-lbl">😔 Fridge Disappointment</span>
+      <div class="prog-track"><div class="prog-fill" id="pb-d" style="width:0%;background:linear-gradient(90deg,var(--pink),#ff8c00)"></div></div>
+      <span class="prog-val" id="pv-d" style="color:var(--pink)">0%</span>
+    </div>
+    <div class="prog-row">
+      <span class="prog-lbl">🏆 Uselessness Score</span>
+      <div class="prog-track"><div class="prog-fill" id="pb-u" style="width:0%;background:linear-gradient(90deg,var(--cyan),var(--purple))"></div></div>
+      <span class="prog-val" id="pv-u" style="color:var(--cyan)">0%</span>
+    </div>
+    <div class="prog-row">
+      <span class="prog-lbl">🥦 Veggie Avoidance Rate</span>
+      <div class="prog-track"><div class="prog-fill" id="pb-vg" style="width:0%;background:linear-gradient(90deg,var(--green),#00cc44)"></div></div>
+      <span class="prog-val" id="pv-vg" style="color:var(--green)">0%</span>
+    </div>
+  </div>
+  <div class="sec-title">Food <span>Interaction</span> Stats</div>
+  <div class="food-stats-grid" id="food-stats-grid"></div>
+  <div class="best-worst">
+    <div class="bw-item"><div class="bw-lbl">MOST VISITED</div><div class="bw-val" id="bw-most">—</div></div>
+    <div style="width:1px;height:36px;background:rgba(255,255,255,.1)"></div>
+    <div class="bw-item"><div class="bw-lbl">MOST IGNORED</div><div class="bw-val" id="bw-least" style="color:var(--text-dim)">—</div></div>
+  </div>
+  <button class="reset-btn" onclick="resetStats()">🗑️ Reset All Statistics</button>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     PERSONALITY PAGE
+═══════════════════════════════════════════════════════════ -->
+<section id="page-personality" class="page">
+  <h1 class="disp" style="font-size:2.2rem;margin-top:10px">PERSONALITY</h1>
+  <p class="ml-sub">"ഇപ്പോൾ ഫ്രിഡ്ജ് ഏത് mood ആണ്?"</p>
+  <div class="pers-card" id="pers-card">
+    <span class="pers-face" id="pers-face">😒</span>
+    <div class="pers-name" id="pers-name">DISAPPOINTED</div>
+    <div class="pers-quote" id="pers-quote">"നിന്നിൽ നിന്ന് കൂടുതൽ പ്രതീക്ഷിച്ചിരുന്നു."</div>
+    <button class="btn btn-secondary" onclick="nextPersonality()" style="margin-top:14px;font-size:.83rem">🔄 Change Personality</button>
+  </div>
+  <div class="sec-title">All <span>Personalities</span></div>
+  <div class="pers-grid" id="pers-grid"></div>
+  <div class="iq-card">
+    <div class="iq-lbl">FRIDGE IQ</div>
+    <div class="iq-num" id="iq-num">147</div>
+    <div class="iq-exp" id="iq-exp">"ഇത്ര IQ ഉണ്ടായിട്ടും നിങ്ങൾ 15 മിനിറ്റിൽ 8 പ്രാവശ്യം ഫ്രിഡ്ജ് തുറന്നു."</div>
+    <button class="btn btn-ghost" onclick="randomIQ()" style="margin-top:14px;font-size:.83rem">🧠 Recalculate IQ</button>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     USELESSNESS PAGE
+═══════════════════════════════════════════════════════════ -->
+<section id="page-useless" class="page">
+  <h1 class="disp" style="font-size:2rem;margin-top:10px">USELESSNESS SCORE</h1>
+  <p class="ml-sub">YOUR ACHIEVEMENT TODAY</p>
+  <div class="score-circle-wrap">
+    <div class="score-ring" id="score-ring">
+      <div class="score-inner">
+        <div class="score-num" id="score-num">0</div>
+        <div class="score-pct">%</div>
+      </div>
+    </div>
+  </div>
+  <div>
+    <div class="useless-rank-title" id="u-rank">CALCULATING...</div>
+    <div class="useless-congrats" id="u-congrats">...</div>
+  </div>
+  <div class="card" style="text-align:center;max-width:480px;width:100%">
+    <p class="ml-sub">"Congratulations."</p>
+    <p class="ml-sub" style="color:var(--text-dim);margin-top:6px">"You have successfully achieved absolutely nothing."</p>
+    <div style="font-size:2rem;margin-top:14px" id="u-emoji">🏆</div>
+  </div>
+  <div class="sec-title">Ranking <span>Tiers</span></div>
+  <div class="rank-tiers" id="rank-tiers"></div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     ABOUT PAGE
+═══════════════════════════════════════════════════════════ -->
+<section id="page-about" class="page">
+  <h1 class="disp" style="font-size:2rem;margin-top:10px">ABOUT</h1>
+  <p class="tagline">"ഭക്ഷണം അല്ല, വിമർശനമാണ് ഇവിടെ ഫ്രീ!"</p>
+  <div class="about-card">
+    <div class="ab-sec">
+      <div class="ab-lbl">📋 Project Name</div>
+      <div class="ab-val" style="font-family:var(--font-display);font-size:1.4rem;color:var(--cyan)">FRIDGIT</div>
+      <div class="ab-val" style="font-size:.82rem;color:var(--text-dim);margin-top:3px">The Fridge That Judges You</div>
+    </div>
+    <div class="ab-sec"><div class="ab-lbl">🎯 Objective</div><div class="ab-val">To create an unnecessarily intelligent solution to an unnecessary problem.</div></div>
+    <div class="ab-sec"><div class="ab-lbl">❗ Problem</div><div class="ab-val">People unnecessarily open refrigerators.</div></div>
+    <div class="ab-sec"><div class="ab-lbl">💡 Solution</div><div class="ab-val">Build a refrigerator that unnecessarily judges them.</div></div>
+    <div class="ab-sec"><div class="ab-lbl">📊 Result</div><div class="ab-val">The problem still exists.</div></div>
+    <div class="ab-sec"><div class="ab-lbl">🌍 Social Impact</div><div class="ab-val">Absolutely none.</div></div>
+    <div class="ab-sec">
+      <div class="ab-lbl">🛠️ Tech Stack</div>
+      <div class="tech-pills">
+        <span class="tech-pill">HTML5</span><span class="tech-pill">CSS3</span><span class="tech-pill">Vanilla JS</span>
+        <span class="tech-pill">LocalStorage</span><span class="tech-pill">Web Audio API</span>
+        <span class="tech-pill">CSS Animations</span><span class="tech-pill">Sarcasm Engine™</span>
+      </div>
+    </div>
+    <div class="ab-sec"><div class="ab-lbl">📜 License</div><div class="ab-val">Openly useless. Use freely.</div></div>
+  </div>
+  <div class="about-card" style="text-align:center">
+    <div style="font-size:2.8rem;margin-bottom:10px">🧊</div>
+    <div class="ml-h" style="font-size:1.1rem">"എന്താടാ വീണ്ടും വന്നത്?"</div>
+    <div class="ml-sub" style="margin-top:6px">A refrigerator that judges you for absolutely no reason.</div>
+    <div style="margin-top:14px;padding-top:14px;border-top:1px solid rgba(255,255,255,.07)">
+      <div style="font-size:.72rem;color:var(--text-dim)">Built with 💔 and excessive sarcasm</div>
+      <div style="font-size:.72rem;color:var(--text-dim);margin-top:3px">© 2024 FRIDGIT Corp. All rights are useless.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     OVERLAYS
+═══════════════════════════════════════════════════════════ -->
+
+<!-- Anger -->
+<div class="anger-overlay" id="anger-overlay">
+  <div style="font-size:3.5rem;animation:shake .3s infinite">🤬</div>
+  <div class="anger-title">"ഭക്ഷണം അല്ല, വിമർശനമാണ് ഇവിടെ ഫ്രീ!"</div>
+  <div style="font-family:var(--font-ml);color:var(--text-dim);max-width:380px;text-align:center;line-height:1.9">
+    <div id="anger-line">10 പ്രാവശ്യം തുറന്നു.</div>
+    <div>"10 പ്രാവശ്യവും ഭക്ഷണം മാറിയില്ല."</div>
+    <div>"പ്രശ്നം ഫ്രിഡ്ജിനല്ല."</div>
+  </div>
+  <div class="anger-timer" id="anger-cd">10</div>
+  <div style="font-family:var(--font-ml);color:var(--text-dim);font-size:.88rem">"ഇനി ഒന്ന് ആലോചിക്ക്."</div>
+</div>
+
+<!-- Final Boss -->
+<div class="boss-overlay" id="boss-overlay">
+  <div style="font-size:2.8rem">🕵️</div>
+  <div class="boss-q">"തുറന്നിട്ട് അടച്ചിട്ട് വീണ്ടും തുറന്നതിന്റെ കാരണം?"</div>
+  <div class="boss-opts" id="boss-opts">
+    <button class="boss-opt" onclick="bossAnswer(this)">A. വിശപ്പ്</button>
+    <button class="boss-opt" onclick="bossAnswer(this)">B. പ്രതീക്ഷ</button>
+    <button class="boss-opt" onclick="bossAnswer(this)">C. Memory loss</button>
+    <button class="boss-opt" onclick="bossAnswer(this)">D. ഒന്നും അറിയില്ല</button>
+  </div>
+  <div class="boss-ans" id="boss-ans">"ശരി."</div>
+</div>
+
+<!-- Food Modal -->
+<div class="food-modal" id="food-modal">
+  <div class="modal-card">
+    <span class="modal-emoji" id="m-emoji">🍕</span>
+    <div style="display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:6px">
+      <div class="modal-reaction" id="m-reaction">ഒന്ന് നോക്കി…</div>
+      <button class="speak-btn" id="m-speak-btn" onclick="repeatFoodReaction()" title="Pronounce again">🗣️</button>
+    </div>
+    <div class="modal-question" id="m-question">ഇത് എടുക്കണോ?</div>
+    <div class="modal-dec-btns" id="m-btns">
+      <button class="btn btn-yes" onclick="decide('yes')">✅ YES</button>
+      <button class="btn btn-no"  onclick="decide('no')">❌ NO</button>
+      <button class="btn btn-think" onclick="decide('think')">🤔 LET ME THINK</button>
+    </div>
+    <div class="modal-response" id="m-resp"></div>
+    <button class="btn btn-ghost" id="m-close" onclick="closeModal()" style="display:none;margin-top:10px;font-size:.83rem">Close</button>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
