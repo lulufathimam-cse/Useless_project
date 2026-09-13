@@ -42,16 +42,16 @@ For Software:
 # Installation
 No installation or build step required — it's a single static HTML file.
 ```
-git clone <your-repo-url>
+git clone <l>
 cd <your-repo-folder>
 ```
 
 # Run
 Just open the file directly in any modern browser:
 ```
-open fridge.html      # macOS
-start fridge.html     # Windows
-xdg-open fridge.html  # Linux
+[https://nthaivide.vercel.app/]      # macOS
+[https://nthaivide.vercel.app/]     # Windows
+[https://nthaivide.vercel.app/]  # Linux
 ```
 Or serve it locally if you prefer:
 ```
@@ -63,13 +63,16 @@ python3 -m http.server 8000
 For Software:
 
 # Screenshots (Add at least 3)
-![Screenshot1](Add screenshot 1 here with proper name)
+![<img width="1589" height="739" alt="image" src="https://github.com/user-attachments/assets/822fb326-41c8-403b-89e3-45428efe3179" />
+](Add screenshot 1 here with proper name)
 *Fridge closed — the default steel case view*
 
-![Screenshot2](Add screenshot 2 here with proper name)
+![<img width="1599" height="802" alt="image" src="https://github.com/user-attachments/assets/5728112a-0d52-45a9-ab27-2ff9ba4621df" />
+]()](Add screenshot 2 here with proper name)
 *Freezer and main door both open, showing shelves, food items, and the interior light*
 
-![Screenshot3](Add screenshot 3 here with proper name)
+![<img width="1599" height="771" alt="image" src="https://github.com/user-attachments/assets/f35b0a38-e299-47d3-ad3f-d9eb74731adf" />
+](Add screenshot 3 here with proper name)
 *A roast being delivered after opening the fridge*
 
 # Diagrams
