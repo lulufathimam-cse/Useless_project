@@ -75,25 +75,6 @@ For Software:
 ](Add screenshot 3 here with proper name)
 *A roast being delivered after opening the fridge*
 
-# Diagrams
-![Workflow](Add your workflow/architecture diagram here)
-*Click on door → JS toggles the door's open class → CSS transition rotates the door on its hinge → roast line is triggered and displayed*
-
-For Hardware:
-
-# Schematic & Circuit
-N/A — no hardware used in this project.
-
-# Build Photos
-N/A — no physical build; this is a browser-based 3D interface.
-
-### Project Demo
-# Video
-[Add your demo video link here]
-*Shows clicking the freezer and fridge doors open/closed, the drag-to-orbit camera, and the fridge's roast reactions.*
-
-# Additional Demos
-[Add any extra demo materials/links]
 
 ## Team Contributions
 - Lulu Fathima: [Specific contributions]
